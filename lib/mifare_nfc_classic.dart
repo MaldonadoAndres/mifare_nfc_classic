@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
+import 'package:flutter/material.dart';
 
 class MifareNfcClassic {
   static const MethodChannel _channel =
@@ -14,6 +15,17 @@ class MifareNfcClassic {
 
   static Future<void> read() async {
     final response = await _channel.invokeMethod('read');
+    Logger().i(response);
+  }
+
+  static Future<void> readBlockOfSector({
+    @required int blockIndex,
+    @required int sectorIndex,
+  }) async {
+    final response = await _channel.invokeMethod('readBlockOfSector', {
+      'blockIndex': blockIndex,
+      'sectorIndex': sectorIndex,
+    });
     Logger().i(response);
   }
 

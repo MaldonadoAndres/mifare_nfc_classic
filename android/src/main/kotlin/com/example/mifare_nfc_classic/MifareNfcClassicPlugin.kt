@@ -2,7 +2,6 @@ package com.example.mifare_nfc_classic
 
 import android.app.Activity
 import android.nfc.NfcAdapter
-import android.nfc.Tag
 import android.nfc.tech.MifareClassic
 import android.util.Log
 import androidx.annotation.NonNull
@@ -14,8 +13,6 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import java.io.IOException
 
 
@@ -26,6 +23,7 @@ class MifareNfcClassicPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private lateinit var channel: MethodChannel
     private lateinit var mNfcAdapter: NfcAdapter
     private lateinit var mifareClassic: MifareClassic
+    private val flag = NfcAdapter.FLAG_READER_NFC_A
 
     companion object {
         const val CHANNEL_NAME = "mifare_nfc_classic'"
@@ -63,7 +61,12 @@ class MifareNfcClassicPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 result.success("Android ${android.os.Build.VERSION.RELEASE}")
             }
             "read" -> {
-                readMifareCard(result)
+                readFromNFC(result)
+            }
+            "readBlockOfSector" -> {
+                val blockIndex = call.argument<Int>("blockIndex")!!
+                val sectorIndex = call.argument<Int>("sectorIndex")!!
+                readBlockOfSector(result = result, blocIndex = blockIndex, sectorIndex = sectorIndex)
             }
             "write" -> {
                 writeMifare(result)
@@ -81,54 +84,71 @@ class MifareNfcClassicPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         mNfcAdapter = NfcAdapter.getDefaultAdapter(flutterPluginBinding.applicationContext)
     }
 
-
-    private fun readMifareCard(result: Result) {
-
-        mNfcAdapter.enableReaderMode(activity, { tag ->
-            mNfcAdapter.disableReaderMode(activity)
-            activity.runOnUiThread { result.success(readFromNFC(tag)) }
-
-
-        }, NfcAdapter.FLAG_READER_NFC_A, null)
-    }
-
-
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
     }
 
-
-    private fun readFromNFC(tag: Tag): String {
-        val blocks = arrayListOf<String>()
-        try {
-            mifareClassic = MifareClassic.get(tag)
-            mifareClassic.connect()
-            mifareClassic.authenticateSectorWithKeyA(2, MifareClassic.KEY_DEFAULT)
-            val firstBlock: Int = mifareClassic.sectorToBlock(2)
-            val lastBlock = firstBlock + 4
-            for (i in firstBlock until lastBlock) {
-                try {
-                    var blockBytes: ByteArray = mifareClassic.readBlock(i)
-                    if (blockBytes.size < 16) {
-                        throw IOException()
-                    }
-                    if (blockBytes.size > 16) {
-                        blockBytes = blockBytes.copyOf(16)
-                    }
-                    val hex = Utils.byte2Hex(blockBytes)
-                    blocks.add(hex!!)
-                    Log.d(TAG, "readFromNFC: $hex")
-                } catch (e: Exception) {
-
+    private fun readBlockOfSector(result: Result, sectorIndex: Int, blocIndex: Int) {
+        Log.d(TAG, "readBlock: Sector Index -> $sectorIndex Block Index -> $blocIndex")
+        mNfcAdapter.enableReaderMode(activity, { tag ->
+            try {
+                mifareClassic = MifareClassic.get(tag)
+                mifareClassic.connect()
+                mifareClassic.authenticateSectorWithKeyA(sectorIndex, MifareClassic.KEY_DEFAULT)
+                var blockBytes = mifareClassic.readBlock(blocIndex)
+                if (blockBytes.size < 16) {
+                    throw IOException()
                 }
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "readFromNFC: ", e)
-        } finally {
-            mifareClassic.close()
-        }
-        return blocks[0]
+                if (blockBytes.size > 16) {
+                    blockBytes = blockBytes.copyOf(16)
+                }
+                //Utils.printEntireBlock(mifareClassic, sectorIndex)
 
+                Log.d(TAG, "readBlock: ${Utils.byte2Hex(blockBytes)}")
+                activity.runOnUiThread { result.success(Utils.byte2Hex(blockBytes)) }
+            } catch (e: Exception) {
+                activity.runOnUiThread { result.error("404", e.localizedMessage, null) }
+            } finally {
+                mifareClassic.close()
+                mNfcAdapter.disableReaderMode(activity)
+            }
+        }, flag, null)
+    }
+
+    private fun readFromNFC(result: Result) {
+        mNfcAdapter.enableReaderMode(activity, { tag ->
+            val blocks = arrayListOf<String>()
+            try {
+                mifareClassic = MifareClassic.get(tag)
+                mifareClassic.connect()
+                mifareClassic.authenticateSectorWithKeyA(2, MifareClassic.KEY_DEFAULT)
+                val firstBlock: Int = mifareClassic.sectorToBlock(2)
+                val lastBlock = firstBlock + 4
+                for (i in firstBlock until lastBlock) {
+                    try {
+                        var blockBytes: ByteArray = mifareClassic.readBlock(i)
+                        if (blockBytes.size < 16) {
+                            throw IOException()
+                        }
+                        if (blockBytes.size > 16) {
+                            blockBytes = blockBytes.copyOf(16)
+                        }
+                        val hex = Utils.byte2Hex(blockBytes)
+                        blocks.add(hex!!)
+                        Log.d(TAG, "readFromNFC: $hex")
+                    } catch (e: Exception) {
+
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "readFromNFC: ", e)
+            } finally {
+                mifareClassic.close()
+                mNfcAdapter.disableReaderMode(activity)
+            }
+            activity.runOnUiThread { result.success(blocks[0]) }
+
+        }, NfcAdapter.FLAG_READER_NFC_A, null)
     }
 
     private fun writeMifare(result: Result) {

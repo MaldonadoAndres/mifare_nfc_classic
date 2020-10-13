@@ -1,6 +1,8 @@
 package com.example.mifare_nfc_classic
 
+import android.nfc.tech.MifareClassic
 import android.util.Log
+import java.io.IOException
 
 private const val TAG = "Utils"
 
@@ -38,6 +40,27 @@ object Utils {
             )
         }
         return data
+    }
+
+    fun printEntireBlock(mifareClassic: MifareClassic, sectorIndex: Int) {
+        val firstBlock: Int = mifareClassic.sectorToBlock(sectorIndex)
+        val lastBlock = firstBlock + 4
+        Log.d(TAG, "printEntireBlock: Range First Block -> $firstBlock Last Block -> $lastBlock")
+        for (i in firstBlock until lastBlock) {
+            try {
+                var blockBytes: ByteArray = mifareClassic.readBlock(i)
+                if (blockBytes.size < 16) {
+                    throw IOException()
+                }
+                if (blockBytes.size > 16) {
+                    blockBytes = blockBytes.copyOf(16)
+                }
+                val hex = byte2Hex(blockBytes)
+                Log.d(TAG, "Printing Block: $hex")
+            } catch (e: Exception) {
+
+            }
+        }
     }
 
 }
