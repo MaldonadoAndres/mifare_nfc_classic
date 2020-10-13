@@ -50,7 +50,21 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FlatButton(
+                color: Colors.red,
+                onPressed: () => MifareNfcClassic.read(),
+                child: Text('Read'),
+              ),
+              FlatButton(
+                color: Colors.blue,
+                onPressed: () => MifareNfcClassic.write(),
+                child: Text('Write'),
+              ),
+            ],
+          ),
         ),
       ),
     );

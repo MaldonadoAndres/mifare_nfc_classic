@@ -1,8 +1,8 @@
 name: mifare_nfc_classic
 description: A new Flutter plugin.
 version: 0.0.1
-author:
-homepage:
+author: null
+homepage: null
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -11,6 +11,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  logger: ^0.9.4
 
 dev_dependencies:
   flutter_test:
@@ -18,7 +19,6 @@ dev_dependencies:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
-
 # The following section is specific to Flutter.
 flutter:
   # This section identifies this Flutter project as a plugin project.
@@ -30,9 +30,6 @@ flutter:
       android:
         package: com.example.mifare_nfc_classic
         pluginClass: MifareNfcClassicPlugin
-      ios:
-        pluginClass: MifareNfcClassicPlugin
-
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
@@ -43,7 +40,6 @@ flutter:
   #
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
-
   # To add custom fonts to your plugin package, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
   # "family" key with the font family name, and a "fonts" key with a
