@@ -29,6 +29,15 @@ class MifareNfcClassic {
     Logger().i(response);
   }
 
+  static Future<void> readSector({
+    @required int sectorIndex,
+  }) async {
+    final response = await _channel.invokeMethod('readSector', {
+      'sectorIndex': sectorIndex,
+    });
+    Logger().i(response);
+  }
+
   static Future<void> write() async {
     final response = await _channel.invokeMethod('write');
     Logger().i(response);

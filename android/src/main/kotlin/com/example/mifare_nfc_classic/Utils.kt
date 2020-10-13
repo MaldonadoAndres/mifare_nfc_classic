@@ -42,7 +42,8 @@ object Utils {
         return data
     }
 
-    fun printEntireBlock(mifareClassic: MifareClassic, sectorIndex: Int) {
+    fun printEntireBlock(mifareClassic: MifareClassic, sectorIndex: Int): ArrayList<String> {
+        val sectorAsHex = arrayListOf<String>()
         val firstBlock: Int = mifareClassic.sectorToBlock(sectorIndex)
         val lastBlock = firstBlock + 4
         Log.d(TAG, "printEntireBlock: Range First Block -> $firstBlock Last Block -> $lastBlock")
@@ -56,11 +57,13 @@ object Utils {
                     blockBytes = blockBytes.copyOf(16)
                 }
                 val hex = byte2Hex(blockBytes)
+                sectorAsHex.add(hex!!)
                 Log.d(TAG, "Printing Block: $hex")
             } catch (e: Exception) {
 
             }
         }
+        return sectorAsHex
     }
 
 }

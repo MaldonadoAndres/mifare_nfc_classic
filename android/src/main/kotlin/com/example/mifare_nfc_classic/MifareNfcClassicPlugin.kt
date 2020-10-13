@@ -68,6 +68,10 @@ class MifareNfcClassicPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 val sectorIndex = call.argument<Int>("sectorIndex")!!
                 readBlockOfSector(result = result, blocIndex = blockIndex, sectorIndex = sectorIndex)
             }
+            "readSector" -> {
+                val sectorIndex = call.argument<Int>("sectorIndex")!!
+                readSector(result = result, sectorIndex = sectorIndex)
+            }
             "write" -> {
                 writeMifare(result)
             }
@@ -89,7 +93,7 @@ class MifareNfcClassicPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     private fun readBlockOfSector(result: Result, sectorIndex: Int, blocIndex: Int) {
-        Log.d(TAG, "readBlock: Sector Index -> $sectorIndex Block Index -> $blocIndex")
+        Log.d(TAG, "readBlockOfSector: Sector Index -> $sectorIndex Block Index -> $blocIndex")
         mNfcAdapter.enableReaderMode(activity, { tag ->
             try {
                 mifareClassic = MifareClassic.get(tag)
@@ -106,6 +110,24 @@ class MifareNfcClassicPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
                 Log.d(TAG, "readBlock: ${Utils.byte2Hex(blockBytes)}")
                 activity.runOnUiThread { result.success(Utils.byte2Hex(blockBytes)) }
+            } catch (e: Exception) {
+                activity.runOnUiThread { result.error("404", e.localizedMessage, null) }
+            } finally {
+                mifareClassic.close()
+                mNfcAdapter.disableReaderMode(activity)
+            }
+        }, flag, null)
+    }
+
+    private fun readSector(result: Result, sectorIndex: Int) {
+        Log.d(TAG, "readSector: Sector Index -> $sectorIndex")
+        mNfcAdapter.enableReaderMode(activity, { tag ->
+            try {
+                mifareClassic = MifareClassic.get(tag)
+                mifareClassic.connect()
+                mifareClassic.authenticateSectorWithKeyA(sectorIndex, MifareClassic.KEY_DEFAULT)
+                val sector = Utils.printEntireBlock(mifareClassic, sectorIndex)
+                activity.runOnUiThread { result.success(sector) }
             } catch (e: Exception) {
                 activity.runOnUiThread { result.error("404", e.localizedMessage, null) }
             } finally {

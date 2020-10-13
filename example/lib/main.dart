@@ -32,6 +32,13 @@ class _MyAppState extends State<MyApp> {
                 child: Text('Read'),
               ),
               FlatButton(
+                color: Colors.yellow,
+                onPressed: () => MifareNfcClassic.readSector(
+                  sectorIndex: 5,
+                ),
+                child: Text('Read X Sector'),
+              ),
+              FlatButton(
                 color: Colors.blue,
                 onPressed: () => MifareNfcClassic.write(),
                 child: Text('Write'),
