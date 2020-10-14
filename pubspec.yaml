@@ -1,8 +1,8 @@
 name: mifare_nfc_classic
 description: A new Flutter plugin.
 version: 0.0.1
-author: null
-homepage: null
+author: Andres Maldonado
+homepage: https://github.com/MaldonadoAndres/mifare_nfc_classic
 
 environment:
   sdk: ">=2.7.0 <3.0.0"

@@ -97,3 +97,4 @@ lib/generated_plugin_registrant.dart
 *.3dm
 *.max
 **/*.g.dart
+
