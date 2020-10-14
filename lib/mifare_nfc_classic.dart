@@ -8,6 +8,8 @@ class MifareNfcClassic {
   static const MethodChannel _channel =
       const MethodChannel('mifare_nfc_classic');
 
+  // Creo que debes agregar este comentario
+
   static Future<String> readBlockOfSector({
     @required int blockIndex,
     @required int sectorIndex,
