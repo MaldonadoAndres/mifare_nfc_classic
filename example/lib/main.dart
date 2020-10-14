@@ -14,6 +14,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
+    MifareNfcClassic.availability;
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
@@ -43,9 +44,31 @@ class _MyAppState extends State<MyApp> {
                 onPressed: () => MifareNfcClassic.writeBlockOfSector(
                   blockIndex: 9,
                   sectorIndex: 2,
-                  message: 'AAAAAAAAAAAAAAAAAAAA',
+                  message: 'Holis',
                 ),
                 child: Text('Write X Block'),
+              ),
+              FlatButton(
+                color: Colors.yellow,
+                onPressed: () => MifareNfcClassic.readSector(
+                  sectorIndex: 2,
+                ),
+                child: Text('Read X Sector'),
+              ),
+              FlatButton(
+                color: Colors.pink,
+                onPressed: () => MifareNfcClassic.readAll,
+                child: Text('Read All'),
+              ),
+              FlatButton(
+                color: Colors.orange,
+                onPressed: () async => await MifareNfcClassic.sectorCount,
+                child: Text('Get Sector Count'),
+              ),
+              FlatButton(
+                color: Colors.amber,
+                onPressed: () async => await MifareNfcClassic.blockCount,
+                child: Text('Get Block Count'),
               ),
             ],
           ),
