@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-
 import 'package:mifare_nfc_classic/mifare_nfc_classic.dart';
+
+import 'package:mifare_nfc_classic_example/example_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -12,67 +13,43 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final isAvailable = MifareNfcClassic.availability;
   @override
   Widget build(BuildContext context) {
-    MifareNfcClassic.availability;
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              FlatButton(
-                color: Colors.red,
-                onPressed: () => MifareNfcClassic.readBlockOfSector(
-                  blockIndex: 9,
-                  sectorIndex: 2,
-                ),
-                child: Text('Read'),
-              ),
-              FlatButton(
-                color: Colors.yellow,
-                onPressed: () => MifareNfcClassic.readSector(
-                  sectorIndex: 2,
-                ),
-                child: Text('Read X Sector'),
-              ),
-              FlatButton(
-                color: Colors.blue,
-                onPressed: () => MifareNfcClassic.writeBlockOfSector(
-                  blockIndex: 9,
-                  sectorIndex: 2,
-                  message: 'Holis',
-                ),
-                child: Text('Write X Block'),
-              ),
-              FlatButton(
-                color: Colors.yellow,
-                onPressed: () => MifareNfcClassic.readSector(
-                  sectorIndex: 2,
-                ),
-                child: Text('Read X Sector'),
-              ),
-              FlatButton(
-                color: Colors.pink,
-                onPressed: () => MifareNfcClassic.readAll,
-                child: Text('Read All'),
-              ),
-              FlatButton(
-                color: Colors.orange,
-                onPressed: () async => await MifareNfcClassic.sectorCount,
-                child: Text('Get Sector Count'),
-              ),
-              FlatButton(
-                color: Colors.amber,
-                onPressed: () async => await MifareNfcClassic.blockCount,
-                child: Text('Get Block Count'),
-              ),
-            ],
-          ),
-        ),
+      home: FutureBuilder(
+        future: isAvailable,
+        builder: (_, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            switch (snapshot.data) {
+              case AVAILABILITY.AVAILABLE:
+                return ExamplePage();
+                break;
+              case AVAILABILITY.NOT_ENABLED:
+                return Scaffold(
+                  body: Center(
+                    child: Text('NFC Not Enabled.'),
+                  ),
+                );
+                break;
+              case AVAILABILITY.NOT_SUPPORTED:
+                return Scaffold(
+                  body: Center(
+                    child: Text('NFC Not Supported.'),
+                  ),
+                );
+                break;
+              default:
+                return Scaffold(
+                  body: Center(
+                    child: Text('How?'),
+                  ),
+                );
+            }
+          } else {
+            return Container();
+          }
+        },
       ),
     );
   }

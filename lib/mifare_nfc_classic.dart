@@ -8,7 +8,7 @@ class MifareNfcClassic {
   static const MethodChannel _channel =
       const MethodChannel('mifare_nfc_classic');
 
-  static Future<void> readBlockOfSector({
+  static Future<String> readBlockOfSector({
     @required int blockIndex,
     @required int sectorIndex,
   }) async {
@@ -17,6 +17,7 @@ class MifareNfcClassic {
       'sectorIndex': sectorIndex,
     });
     Logger().i(response);
+    return response as String;
   }
 
   static Future<void> writeBlockOfSector({
@@ -32,11 +33,13 @@ class MifareNfcClassic {
     Logger().i(response);
   }
 
-  static Future<void> readSector({@required int sectorIndex}) async {
+  static Future<List<String>> readSector({@required int sectorIndex}) async {
     final response = await _channel.invokeMethod('readSector', {
       'sectorIndex': sectorIndex,
     });
     Logger().i(response);
+
+    return List<String>.from(response);
   }
 
   static Future<int> get sectorCount async {
