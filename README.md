@@ -1,15 +1,97 @@
 # mifare_nfc_classic
 
-A new Flutter plugin.
+A Flutter plugin for Android for reading and writing NFC cards
 
-## Getting Started
+## Notice
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+- Only Mifare Classic
+- Only NfcA technology
+- Only works with default password
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Setup
 
+- Requires Android API level 19 or later.
+- Add [android.permission.NFC ](https://developer.android.com/reference/android/Manifest.permission.html#NFC) to your AndroidManifest.xml.
+
+## Notes
+
+- Remember that you shouln't write in the sector 0 of any card
+- If you write in the 4th block of any sector write down what you write this is the new password for write and read in this sector
+
+## Usage
+
+**Check NFC Availability**
+
+```dart
+// Check availability
+AVAILABILITY isAvailable = await MifareNfcClassic.availability;
+switch(isAvailable){
+    case(AVAILABILITY.AVAILABLE):
+        //NFC is enabled.
+        break;
+    case(AVAILABILITY.NOT_ENABLED):
+        //The phone support NFC but user has to enable it.
+        break;
+    case(AVAILABILITY.NOT_SUPPORTED):
+        //The phone doesn't support NFC.
+        break;
+}
+```
+
+**Get Sector or Block Count**
+
+```dart
+int _sectorCount = await MifareNfcClassic.sectorCount;
+int _blockCount = await MifareNfcClassic.blockCount;
+```
+
+**Read a specific Sector**
+
+```dart
+List<String> _sector = await MifareNfcClassic.readSector(sectorIndex:index)
+/*
+["FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"]
+*/
+```
+
+**Read a specific Block of a specific Sector**
+
+```dart
+String _block = await MifareNfcClassic.readBlockOfSector(blockIndex: _blockIndex,sectorIndex: _sectorIndex);
+/*
+"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+*/
+```
+
+**Read all sectors of a card**
+
+Note: This operation take some seconds so leave the card close to the phone like for 3 seconds.
+
+```dart
+List<List<String>> _card = await MifareNfcClassic.readAll;
+/*
+[["FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"],
+...
+...
+...
+["FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"]]
+*/
+```
+
+**Write a specific Block of a specific Sector**
+
+```dart
+bool didWrite = await  MifareNfcClassic.writeBlockOfSector(blockIndex: _blockIndex,sectorIndex: _sectorIndex,message: _message);
+/*
+didWrite indicates if the operation completed successfully or not.
+*/
+```
