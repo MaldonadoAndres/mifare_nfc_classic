@@ -8,7 +8,7 @@ private const val TAG = "Utils"
 
 object Utils {
 
-    fun byte2Hex(bytes: ByteArray?): String? {
+    fun byteArray2Hex(bytes: ByteArray?): String? {
         val ret = StringBuilder()
         if (bytes != null) {
             for (b in bytes) {
@@ -16,6 +16,10 @@ object Utils {
             }
         }
         return ret.toString()
+    }
+
+    fun byteToHex(byte: Byte): String {
+        return String.format("%02X", byte.toInt() and 0xFF)
     }
 
 
@@ -42,11 +46,27 @@ object Utils {
         return data
     }
 
+    fun rawHexToByteArray(hex: String): ByteArray {
+       // Log.d(TAG, "rawHexToByteArray: Converting $hex")
+        val toWrite = ByteArray(16)
+        val decList: ArrayList<Int> = arrayListOf()
+        for (i in hex.indices step 2) {
+            val temp = "${hex[i]}${hex[i + 1]}"
+            decList.add(temp.toInt(radix = 16))
+        }
+        //Log.d(TAG, "rawHexToByteArray: $decList")
+        //Log.d(TAG, "rawHexToByteArray: $toWrite")
+        for (i in decList.indices) {
+            toWrite[i] = decList[i].toByte()
+        }
+        return toWrite
+    }
+
     fun printEntireBlock(mifareClassic: MifareClassic, sectorIndex: Int): ArrayList<String> {
         val sectorAsHex = arrayListOf<String>()
         val firstBlock: Int = mifareClassic.sectorToBlock(sectorIndex)
         val lastBlock = firstBlock + 4
-        Log.d(TAG, "printEntireBlock: Range First Block -> $firstBlock Last Block -> $lastBlock")
+        //Log.d(TAG, "printEntireBlock: Range First Block -> $firstBlock Last Block -> $lastBlock")
         for (i in firstBlock until lastBlock) {
             try {
                 var blockBytes: ByteArray = mifareClassic.readBlock(i)
@@ -56,9 +76,9 @@ object Utils {
                 if (blockBytes.size > 16) {
                     blockBytes = blockBytes.copyOf(16)
                 }
-                val hex = byte2Hex(blockBytes)
+                val hex = byteArray2Hex(blockBytes)
                 sectorAsHex.add(hex!!)
-                Log.d(TAG, "Printing Block: $hex")
+                // Log.d(TAG, "Printing Block: $hex")
             } catch (e: Exception) {
 
             }

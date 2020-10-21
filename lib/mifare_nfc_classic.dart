@@ -13,10 +13,12 @@ class MifareNfcClassic {
   static Future<String> readBlockOfSector({
     @required int blockIndex,
     @required int sectorIndex,
+    String password,
   }) async {
     final response = await _channel.invokeMethod('readBlockOfSector', {
       'blockIndex': blockIndex,
       'sectorIndex': sectorIndex,
+      'password': password ?? 'af0910ceff69'.toUpperCase()
     });
     Logger().i(response);
     return response as String;
@@ -26,18 +28,51 @@ class MifareNfcClassic {
     @required int blockIndex,
     @required int sectorIndex,
     @required String message,
+    String password,
   }) async {
     final response = await _channel.invokeMethod('writeBlockOfSector', {
       'blockIndex': blockIndex,
       'sectorIndex': sectorIndex,
-      'message': message
+      'message': message,
+      'password': password ?? 'af0910ceff69'.toUpperCase()
     });
     Logger().i(response);
   }
 
-  static Future<List<String>> readSector({@required int sectorIndex}) async {
+  static Future<void> changePasswordOfSector({
+    @required int sectorIndex,
+    @required String message,
+    String password,
+  }) async {
+    final response = await _channel.invokeMethod('changePasswordOfSector', {
+      'sectorIndex': sectorIndex,
+      'message': message,
+      'password': password ?? 'af0910ceff69'.toUpperCase()
+    });
+    Logger().i(response);
+  }
+
+  static Future<void> writeRawHexToBlock({
+    @required int blockIndex,
+    @required String message,
+    String password,
+  }) async {
+    final response = await _channel.invokeMethod(
+      'writeRawHexToBlock',
+      {
+        'blockIndex': blockIndex,
+        'message': message,
+        'password': password ?? 'af0910ceff69'.toUpperCase()
+      },
+    );
+    Logger().i(response);
+  }
+
+  static Future<List<String>> readSector(
+      {@required int sectorIndex, String password}) async {
     final response = await _channel.invokeMethod('readSector', {
       'sectorIndex': sectorIndex,
+      'password': password ?? 'af0910ceff69'.toUpperCase()
     });
     Logger().i(response);
 
@@ -50,12 +85,12 @@ class MifareNfcClassic {
     return count;
   }
 
-  static Future<List<List<String>>> get readAll async {
-    final response =
-        await _channel.invokeMethod('readAll') as Map<dynamic, dynamic>;
+  static Future<List<List<String>>> readAll({String password}) async {
+    final response = await _channel.invokeMethod('readAll', {
+      'password': password ?? 'af0910ceff69'.toUpperCase(),
+    }) as Map<dynamic, dynamic>;
     final listOfSectors = List<List<String>>();
     response.forEach((_, list) => listOfSectors.add(List<String>.from(list)));
-    Logger().i(listOfSectors.runtimeType);
     Logger().i(listOfSectors);
     return listOfSectors;
   }

@@ -124,7 +124,7 @@ class _ExamplePageState extends State<ExamplePage> {
                         FlatButton(
                           color: Colors.blue,
                           onPressed: () async {
-                            _cardSectorsInfo = await MifareNfcClassic.readAll;
+                            _cardSectorsInfo = await MifareNfcClassic.readAll();
                             setState(() {});
                           },
                           child: Text('Read All'),
@@ -156,6 +156,7 @@ class _ExamplePageState extends State<ExamplePage> {
                       child: Form(
                         key: _formKey,
                         child: TextFormField(
+                          initialValue: 'af0910ceff69'.toUpperCase(),
                           onSaved: (newValue) => message = newValue,
                           decoration: InputDecoration(
                             border: const OutlineInputBorder(),
@@ -182,6 +183,32 @@ class _ExamplePageState extends State<ExamplePage> {
                         }
                       },
                       child: Text('Write X Block'),
+                    ),
+                    FlatButton(
+                      color: Colors.teal,
+                      onPressed: () async {
+                        _formKey.currentState.save();
+                        if (message.isEmpty) {
+                          showToast(message: "Write Something");
+                        } else {
+                          await MifareNfcClassic.writeRawHexToBlock(
+                              blockIndex: 4, message: message);
+                        }
+                      },
+                      child: Text('Write X Block (Raw)'),
+                    ),
+                    FlatButton(
+                      color: Colors.teal,
+                      onPressed: () async {
+                        _formKey.currentState.save();
+                        if (message.isEmpty) {
+                          showToast(message: "Write Something");
+                        } else {
+                          await MifareNfcClassic.changePasswordOfSector(
+                              sectorIndex: 1, message: message);
+                        }
+                      },
+                      child: Text('Change Password'),
                     ),
                   ],
                 ),
