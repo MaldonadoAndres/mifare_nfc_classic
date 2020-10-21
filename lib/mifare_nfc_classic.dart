@@ -33,6 +33,20 @@ class MifareNfcClassic {
     Logger().i(response);
   }
 
+  static Future<String> overwriteBlock({
+    @required int blockIndex,
+    @required String message,
+    String password,
+  }) async {
+    final response = await _channel.invokeMethod('overwriteBlock', {
+      'blockIndex': blockIndex,
+      'message': message,
+      'password': password,
+    });
+    Logger().i(response);
+    return response as String;
+  }
+
   static Future<void> changePasswordOfSector({
     @required int sectorIndex,
     @required String newPassword,

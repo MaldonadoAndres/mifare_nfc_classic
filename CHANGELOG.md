@@ -1,3 +1,7 @@
+## 0.2.1
+
+- Added function to overwrite a block
+
 ## 0.2.0
 
 - Added Custom Password To All Functions

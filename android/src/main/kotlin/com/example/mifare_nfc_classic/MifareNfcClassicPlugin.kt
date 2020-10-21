@@ -71,6 +71,9 @@ class MifareNfcClassicPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 val newPassword = call.argument<String>("newPassword")!!
                 changePasswordOfSector(result = result, sectorIndex = sectorIndex!!, password = password, newPassword = newPassword)
             }
+            "overwriteBlock" -> {
+                overwriteBlock(result = result, password = password, blockIndex = blockIndex!!, message = message!!)
+            }
             "writeRawHexToBlock" -> {
                 writeRawHexToBlock(result = result, blockIndex = blockIndex!!, message = message!!, password = password)
             }
@@ -174,6 +177,47 @@ class MifareNfcClassicPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         }, flag, null)
     }
 
+    private fun overwriteBlock(result: Result, blockIndex: Int, message: String, password: String?) {
+        var toWrite: ByteArray = byteArrayOf()
+        mNfcAdapter?.enableReaderMode(activity, { tag ->
+            try {
+                val sectorPassword: ByteArray = if (password.isNullOrEmpty()) {
+                    MifareClassic.KEY_DEFAULT
+                } else {
+                    Utils.rawHexToByteArray(hex = password)
+                }
+                Log.d(TAG, "overwriteBlock: $message")
+
+                mifareClassic = MifareClassic.get(tag)
+                mifareClassic.connect()
+                val sectorIndex = mifareClassic.blockToSector(blockIndex)
+                mifareClassic.authenticateSectorWithKeyA(sectorIndex, sectorPassword)
+                toWrite = mifareClassic.readBlock(blockIndex)
+                val decList: ArrayList<Int> = arrayListOf()
+                for (i in message.indices step 2) {
+                    val temp = "${message[i]}${message[i + 1]}"
+                    decList.add(temp.toInt(radix = 16))
+                }
+                for (i in decList.indices) {
+                    toWrite[i] = (decList[i] + toWrite[i].toInt()).toByte()
+                }
+                mifareClassic.writeBlock(
+                        blockIndex,
+                        toWrite
+                )
+
+            } catch (e: Exception) {
+                Log.e(TAG, "writeMifare: ", e)
+            } finally {
+                mifareClassic.close()
+                mNfcAdapter?.disableReaderMode(activity)
+            }
+            activity.runOnUiThread { result.success(Utils.byteArray2Hex(toWrite)) }
+        }, flag, null)
+
+
+    }
+
     //TODO Write to both sides
     private fun changePasswordOfSector(result: Result, sectorIndex: Int, newPassword: String, password: String?) {
         var didWrite = true
@@ -199,6 +243,10 @@ class MifareNfcClassicPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     toWrite[i] = decList[i].toByte()
                     toWrite[10 + i] = decList[i].toByte()
                 }
+                mifareClassic.writeBlock(
+                        blockIndex,
+                        toWrite
+                )
             } catch (e: Exception) {
                 didWrite = false
                 Log.e(TAG, "writeMifare: ", e)
