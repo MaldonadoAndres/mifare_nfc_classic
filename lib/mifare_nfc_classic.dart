@@ -8,46 +8,40 @@ class MifareNfcClassic {
   static const MethodChannel _channel =
       const MethodChannel('mifare_nfc_classic');
 
-  // Creo que debes agregar este comentario
-
-  static Future<String> readBlockOfSector({
+  static Future<String> readBlock({
     @required int blockIndex,
-    @required int sectorIndex,
     String password,
   }) async {
-    final response = await _channel.invokeMethod('readBlockOfSector', {
+    final response = await _channel.invokeMethod('readBlock', {
       'blockIndex': blockIndex,
-      'sectorIndex': sectorIndex,
-      'password': password ?? 'af0910ceff69'.toUpperCase()
+      'password': password,
     });
     Logger().i(response);
     return response as String;
   }
 
-  static Future<void> writeBlockOfSector({
+  static Future<void> writeBlock({
     @required int blockIndex,
-    @required int sectorIndex,
     @required String message,
     String password,
   }) async {
-    final response = await _channel.invokeMethod('writeBlockOfSector', {
+    final response = await _channel.invokeMethod('writeBlock', {
       'blockIndex': blockIndex,
-      'sectorIndex': sectorIndex,
       'message': message,
-      'password': password ?? 'af0910ceff69'.toUpperCase()
+      'password': password,
     });
     Logger().i(response);
   }
 
   static Future<void> changePasswordOfSector({
     @required int sectorIndex,
-    @required String message,
+    @required String newPassword,
     String password,
   }) async {
     final response = await _channel.invokeMethod('changePasswordOfSector', {
       'sectorIndex': sectorIndex,
-      'message': message,
-      'password': password ?? 'af0910ceff69'.toUpperCase()
+      'newPassword': newPassword,
+      'password': password
     });
     Logger().i(response);
   }
@@ -62,7 +56,7 @@ class MifareNfcClassic {
       {
         'blockIndex': blockIndex,
         'message': message,
-        'password': password ?? 'af0910ceff69'.toUpperCase()
+        'password': password,
       },
     );
     Logger().i(response);
@@ -72,7 +66,7 @@ class MifareNfcClassic {
       {@required int sectorIndex, String password}) async {
     final response = await _channel.invokeMethod('readSector', {
       'sectorIndex': sectorIndex,
-      'password': password ?? 'af0910ceff69'.toUpperCase()
+      'password': password,
     });
     Logger().i(response);
 
@@ -87,7 +81,7 @@ class MifareNfcClassic {
 
   static Future<List<List<String>>> readAll({String password}) async {
     final response = await _channel.invokeMethod('readAll', {
-      'password': password ?? 'af0910ceff69'.toUpperCase(),
+      'password': password,
     }) as Map<dynamic, dynamic>;
     final listOfSectors = List<List<String>>();
     response.forEach((_, list) => listOfSectors.add(List<String>.from(list)));

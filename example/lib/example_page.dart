@@ -100,10 +100,8 @@ class _ExamplePageState extends State<ExamplePage> {
                         FlatButton(
                           color: Colors.blue,
                           onPressed: () async {
-                            final message =
-                                await MifareNfcClassic.readBlockOfSector(
+                            final message = await MifareNfcClassic.readBlock(
                               blockIndex: _selectedBlock,
-                              sectorIndex: _selectedSector,
                             );
                             await showToast(message: message);
                           },
@@ -113,7 +111,8 @@ class _ExamplePageState extends State<ExamplePage> {
                           color: Colors.blue,
                           onPressed: () async {
                             final message = await MifareNfcClassic.readSector(
-                              sectorIndex: 2,
+                              sectorIndex: _selectedSector,
+                              password: this.message,
                             );
                             await showToast(
                                 message:
@@ -176,10 +175,8 @@ class _ExamplePageState extends State<ExamplePage> {
                         } else if (message.isEmpty) {
                           showToast(message: "Write Something");
                         } else {
-                          await MifareNfcClassic.writeBlockOfSector(
-                              blockIndex: _selectedBlock,
-                              sectorIndex: _selectedSector,
-                              message: message);
+                          await MifareNfcClassic.writeBlock(
+                              blockIndex: _selectedBlock, message: message);
                         }
                       },
                       child: Text('Write X Block'),
@@ -192,7 +189,7 @@ class _ExamplePageState extends State<ExamplePage> {
                           showToast(message: "Write Something");
                         } else {
                           await MifareNfcClassic.writeRawHexToBlock(
-                              blockIndex: 4, message: message);
+                              blockIndex: _selectedBlock, message: message);
                         }
                       },
                       child: Text('Write X Block (Raw)'),
@@ -205,7 +202,9 @@ class _ExamplePageState extends State<ExamplePage> {
                           showToast(message: "Write Something");
                         } else {
                           await MifareNfcClassic.changePasswordOfSector(
-                              sectorIndex: 1, message: message);
+                            sectorIndex: 1,
+                            newPassword: message,
+                          );
                         }
                       },
                       child: Text('Change Password'),

@@ -57,26 +57,25 @@ class MifareNfcClassicPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         val password: String? = call.argument<String>("password")
-        val blockIndex = call.argument<Int>("blockIndex")!!
-        val sectorIndex = call.argument<Int>("sectorIndex")!!
+        val blockIndex: Int? = call.argument<Int>("blockIndex")
+        val sectorIndex: Int? = call.argument<Int>("sectorIndex")
+        val message: String? = call.argument<String>("message")
         when (call.method) {
-            "readBlockOfSector" -> {
-                readBlockOfSector(result = result, blockIndex = blockIndex, sectorIndex = sectorIndex, password = password)
+            "readBlock" -> {
+                readBlock(result = result, blockIndex = blockIndex!!, password = password)
             }
-            "writeBlockOfSector" -> {
-                val message = call.argument<String>("message")!!
-                writeBlockOfSector(result = result, blockIndex = blockIndex, sectorIndex = sectorIndex, message = message, password = password)
+            "writeBlock" -> {
+                writeBlock(result = result, blockIndex = blockIndex!!, message = message!!, password = password)
             }
             "changePasswordOfSector" -> {
-                val message = call.argument<String>("message")!!
-                changePasswordOfSector(result = result, sectorIndex = sectorIndex, message = message, password = password)
+                val newPassword = call.argument<String>("newPassword")!!
+                changePasswordOfSector(result = result, sectorIndex = sectorIndex!!, password = password, newPassword = newPassword)
             }
             "writeRawHexToBlock" -> {
-                val message = call.argument<String>("message")!!
-                writeRawHexToBlock(result = result, blockIndex = blockIndex, message = message, password = password)
+                writeRawHexToBlock(result = result, blockIndex = blockIndex!!, message = message!!, password = password)
             }
             "readSector" -> {
-                readSector(result = result, sectorIndex = sectorIndex, password = password)
+                readSector(result = result, sectorIndex = sectorIndex!!, password = password)
             }
             "sectorCount" -> sectorCount(result = result)
             "blockCount" -> blockCount(result = result)
@@ -112,8 +111,7 @@ class MifareNfcClassicPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         result.success(message)
     }
 
-    private fun readBlockOfSector(result: Result, sectorIndex: Int, blockIndex: Int, password: String?) {
-        Log.d(TAG, "readBlockOfSector: Sector Index -> $sectorIndex Block Index -> $blockIndex")
+    private fun readBlock(result: Result, blockIndex: Int, password: String?) {
         mNfcAdapter?.enableReaderMode(activity, { tag ->
             try {
                 val sectorPassword: ByteArray = if (password.isNullOrEmpty()) {
@@ -121,8 +119,10 @@ class MifareNfcClassicPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 } else {
                     Utils.rawHexToByteArray(hex = password)
                 }
+
                 mifareClassic = MifareClassic.get(tag)
                 mifareClassic.connect()
+                val sectorIndex = mifareClassic.blockToSector(blockIndex)
                 mifareClassic.authenticateSectorWithKeyA(sectorIndex, sectorPassword)
                 var blockBytes = mifareClassic.readBlock(blockIndex)
                 if (blockBytes.size < 16) {
@@ -139,6 +139,109 @@ class MifareNfcClassicPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 mifareClassic.close()
                 mNfcAdapter?.disableReaderMode(activity)
             }
+        }, flag, null)
+    }
+
+    private fun writeBlock(result: Result, blockIndex: Int, message: String, password: String?) {
+        var didWrite = true
+        mNfcAdapter?.enableReaderMode(activity, { tag ->
+            try {
+                val sectorPassword: ByteArray = if (password.isNullOrEmpty()) {
+                    MifareClassic.KEY_DEFAULT
+                } else {
+                    Utils.rawHexToByteArray(hex = password)
+                }
+                var messageAsHex = Utils.byteArray2Hex(message.toByteArray())
+                val diff = 32 - messageAsHex!!.length
+                messageAsHex = "$messageAsHex${"0".repeat(diff)}"
+                Log.d(TAG, "writeBlockOfSector: $messageAsHex")
+                mifareClassic = MifareClassic.get(tag)
+                mifareClassic.connect()
+                val sectorIndex = mifareClassic.blockToSector(blockIndex)
+                mifareClassic.authenticateSectorWithKeyA(sectorIndex, sectorPassword)
+                mifareClassic.writeBlock(
+                        blockIndex,
+                        Utils.hex2ByteArray(messageAsHex)
+                )
+            } catch (e: Exception) {
+                didWrite = false
+                Log.e(TAG, "writeMifare: ", e)
+            } finally {
+                mifareClassic.close()
+                mNfcAdapter?.disableReaderMode(activity)
+            }
+            activity.runOnUiThread { result.success(didWrite) }
+        }, flag, null)
+    }
+
+    //TODO Write to both sides
+    private fun changePasswordOfSector(result: Result, sectorIndex: Int, newPassword: String, password: String?) {
+        var didWrite = true
+        mNfcAdapter?.enableReaderMode(activity, { tag ->
+            try {
+                val sectorPassword: ByteArray = if (password.isNullOrEmpty()) {
+                    MifareClassic.KEY_DEFAULT
+                } else {
+                    Utils.rawHexToByteArray(hex = password)
+                }
+                mifareClassic = MifareClassic.get(tag)
+                mifareClassic.connect()
+                val blockIndex = mifareClassic.sectorToBlock(sectorIndex) + 3
+                mifareClassic.authenticateSectorWithKeyA(sectorIndex, sectorPassword)
+                val toWrite = mifareClassic.readBlock(blockIndex)
+                val decList: ArrayList<Int> = arrayListOf()
+                for (i in newPassword.indices step 2) {
+                    val temp = "${newPassword[i]}${newPassword[i + 1]}"
+                    decList.add(temp.toInt(radix = 16))
+                }
+
+                for (i in decList.indices) {
+                    toWrite[i] = decList[i].toByte()
+                    toWrite[10 + i] = decList[i].toByte()
+                }
+            } catch (e: Exception) {
+                didWrite = false
+                Log.e(TAG, "writeMifare: ", e)
+            } finally {
+                mifareClassic.close()
+                mNfcAdapter?.disableReaderMode(activity)
+            }
+            activity.runOnUiThread { result.success(didWrite) }
+        }, flag, null)
+
+
+    }
+
+    private fun writeRawHexToBlock(result: Result, blockIndex: Int, message: String, password: String?) {
+        var didWrite = true
+        mNfcAdapter?.enableReaderMode(activity, { tag ->
+            try {
+                val sectorPassword: ByteArray = if (password.isNullOrEmpty()) {
+                    MifareClassic.KEY_DEFAULT
+                } else {
+                    Utils.rawHexToByteArray(hex = password)
+                }
+                mifareClassic = MifareClassic.get(tag)
+                mifareClassic.connect()
+                val sectorIndex = mifareClassic.blockToSector(blockIndex)
+                Log.d(TAG, "writeRawBlockOfSector: $sectorIndex $blockIndex")
+                mifareClassic.authenticateSectorWithKeyA(sectorIndex, sectorPassword)
+                val toWrite = Utils.rawHexToByteArray(hex = message)
+                Log.d(TAG, "writeRawBlockOfSector: ${toWrite.size}")
+                Log.d(TAG, "writeRawBlockOfSector: $toWrite")
+                mifareClassic.writeBlock(
+                        blockIndex,
+                        toWrite
+                )
+
+            } catch (e: Exception) {
+                didWrite = false
+                Log.e(TAG, "writeMifare: ", e)
+            } finally {
+                mifareClassic.close()
+                mNfcAdapter?.disableReaderMode(activity)
+            }
+            activity.runOnUiThread { result.success(didWrite) }
         }, flag, null)
     }
 
@@ -192,121 +295,6 @@ class MifareNfcClassicPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 mNfcAdapter?.disableReaderMode(activity)
             }
         }, flag, null)
-    }
-
-    private fun writeBlockOfSector(result: Result, sectorIndex: Int, blockIndex: Int, message: String, password: String?) {
-        var didWrite = true
-        mNfcAdapter?.enableReaderMode(activity, { tag ->
-            try {
-                val sectorPassword: ByteArray = if (password.isNullOrEmpty()) {
-                    MifareClassic.KEY_DEFAULT
-                } else {
-                    Utils.rawHexToByteArray(hex = password)
-                }
-                var messageAsHex = Utils.byteArray2Hex(message.toByteArray())
-                val diff = 32 - messageAsHex!!.length
-                messageAsHex = "$messageAsHex${"0".repeat(diff)}"
-                Log.d(TAG, "writeBlockOfSector: $messageAsHex")
-                mifareClassic = MifareClassic.get(tag)
-                mifareClassic.connect()
-                mifareClassic.authenticateSectorWithKeyA(sectorIndex, sectorPassword)
-                mifareClassic.writeBlock(
-                        blockIndex,
-                        Utils.hex2ByteArray(messageAsHex)
-                )
-            } catch (e: Exception) {
-                didWrite = false
-                Log.e(TAG, "writeMifare: ", e)
-            } finally {
-                mifareClassic.close()
-                mNfcAdapter?.disableReaderMode(activity)
-            }
-            activity.runOnUiThread { result.success(didWrite) }
-        }, flag, null)
-    }
-
-
-    private fun writeRawHexToBlock(result: Result, blockIndex: Int, message: String, password: String?) {
-        var didWrite = true
-        mNfcAdapter?.enableReaderMode(activity, { tag ->
-            try {
-                val sectorPassword: ByteArray = if (password.isNullOrEmpty()) {
-                    MifareClassic.KEY_DEFAULT
-                } else {
-                    Utils.rawHexToByteArray(hex = password)
-                }
-                mifareClassic = MifareClassic.get(tag)
-                mifareClassic.connect()
-                val sectorIndex = mifareClassic.blockToSector(blockIndex)
-                Log.d(TAG, "writeRawBlockOfSector: $sectorIndex $blockIndex")
-                mifareClassic.authenticateSectorWithKeyA(sectorIndex, sectorPassword)
-                val toWrite = Utils.rawHexToByteArray(hex = message)
-                Log.d(TAG, "writeRawBlockOfSector: ${toWrite.size}")
-                Log.d(TAG, "writeRawBlockOfSector: $toWrite")
-                mifareClassic.writeBlock(
-                        blockIndex,
-                        toWrite
-                )
-
-            } catch (e: Exception) {
-                didWrite = false
-                Log.e(TAG, "writeMifare: ", e)
-            } finally {
-                mifareClassic.close()
-                mNfcAdapter?.disableReaderMode(activity)
-            }
-            activity.runOnUiThread { result.success(didWrite) }
-        }, flag, null)
-    }
-
-    //TODO Write to both sides
-    private fun changePasswordOfSector(result: Result, sectorIndex: Int, message: String, password: String?) {
-        var didWrite = true
-        mNfcAdapter?.enableReaderMode(activity, { tag ->
-            try {
-                val sectorPassword: ByteArray = if (password.isNullOrEmpty()) {
-                    MifareClassic.KEY_DEFAULT
-                } else {
-                    Utils.rawHexToByteArray(hex = password)
-                }
-                mifareClassic = MifareClassic.get(tag)
-                mifareClassic.connect()
-                val blockIndex = mifareClassic.sectorToBlock(sectorIndex) + 3
-                mifareClassic.authenticateSectorWithKeyA(sectorIndex, sectorPassword)
-                val toWrite = mifareClassic.readBlock(blockIndex)
-                val decList: ArrayList<Int> = arrayListOf()
-                for (i in message.indices step 2) {
-                    val temp = "${message[i]}${message[i + 1]}"
-                    decList.add(temp.toInt(radix = 16))
-                }
-
-                for (i in decList.indices) {
-                    toWrite[i] = decList[i].toByte()
-                    toWrite[10 + i] = decList[i].toByte()
-                }
-                var t = ""
-                toWrite.forEach { byte ->
-                    t += Utils.byteToHex(byte)
-                }
-                Log.d(TAG, "changePasswordOfSector: Writing $t")
-                mifareClassic.writeBlock(
-                        blockIndex,
-                        toWrite
-                )
-                val passwordBlock = mifareClassic.readBlock(blockIndex)
-                Log.d(TAG, "changePasswordOfSector: Reading ${Utils.byteArray2Hex(passwordBlock)}")
-
-            } catch (e: Exception) {
-                didWrite = false
-                Log.e(TAG, "writeMifare: ", e)
-            } finally {
-                mifareClassic.close()
-                mNfcAdapter?.disableReaderMode(activity)
-            }
-            activity.runOnUiThread { result.success(didWrite) }
-        }, flag, null)
-
-
     }
 
     private fun sectorCount(result: Result) {
