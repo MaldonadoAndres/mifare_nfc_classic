@@ -17,4 +17,5 @@ class MainActivity : FlutterActivity() {
         super.onPause()
         NfcAdapter.getDefaultAdapter(context)?.disableForegroundDispatch(this)
     }
+
 }

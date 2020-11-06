@@ -5,8 +5,7 @@ import 'package:logger/logger.dart';
 import 'package:flutter/material.dart';
 
 class MifareNfcClassic {
-  static const MethodChannel _channel =
-      const MethodChannel('mifare_nfc_classic');
+  static const MethodChannel _channel = const MethodChannel('mifare_nfc_classic');
 
   static Future<String> readBlock({
     @required int blockIndex,
@@ -33,7 +32,7 @@ class MifareNfcClassic {
     Logger().i(response);
   }
 
-  static Future<String> overwriteBlock({
+  static Future<Map<String, dynamic>> overwriteBlock({
     @required int blockIndex,
     @required String message,
     String password,
@@ -44,7 +43,7 @@ class MifareNfcClassic {
       'password': password,
     });
     Logger().i(response);
-    return response as String;
+    return Map<String, dynamic>.from(response);
   }
 
   static Future<void> changePasswordOfSector({
@@ -52,11 +51,8 @@ class MifareNfcClassic {
     @required String newPassword,
     String password,
   }) async {
-    final response = await _channel.invokeMethod('changePasswordOfSector', {
-      'sectorIndex': sectorIndex,
-      'newPassword': newPassword,
-      'password': password
-    });
+    final response = await _channel.invokeMethod('changePasswordOfSector',
+        {'sectorIndex': sectorIndex, 'newPassword': newPassword, 'password': password});
     Logger().i(response);
   }
 
@@ -76,8 +72,7 @@ class MifareNfcClassic {
     Logger().i(response);
   }
 
-  static Future<List<String>> readSector(
-      {@required int sectorIndex, String password}) async {
+  static Future<List<String>> readSector({@required int sectorIndex, String password}) async {
     final response = await _channel.invokeMethod('readSector', {
       'sectorIndex': sectorIndex,
       'password': password,
@@ -110,8 +105,7 @@ class MifareNfcClassic {
   }
 
   static Future<AVAILABILITY> get availability async {
-    final response =
-        _decodeMessage(await _channel.invokeMethod('isNFCEnabled'));
+    final response = _decodeMessage(await _channel.invokeMethod('isNFCEnabled'));
     Logger().i(response);
     return response;
   }

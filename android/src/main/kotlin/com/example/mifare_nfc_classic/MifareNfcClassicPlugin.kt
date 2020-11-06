@@ -91,6 +91,7 @@ class MifareNfcClassicPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             }
         }
 
+
     }
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
@@ -179,6 +180,7 @@ class MifareNfcClassicPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     private fun overwriteBlock(result: Result, blockIndex: Int, message: String, password: String?) {
         var toWrite: ByteArray = byteArrayOf()
+        var tagId: String? = null
         mNfcAdapter?.enableReaderMode(activity, { tag ->
             try {
                 val sectorPassword: ByteArray = if (password.isNullOrEmpty()) {
@@ -190,6 +192,7 @@ class MifareNfcClassicPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
                 mifareClassic = MifareClassic.get(tag)
                 mifareClassic.connect()
+                tagId = Utils.byteArray2Hex(tag.id)!!
                 val sectorIndex = mifareClassic.blockToSector(blockIndex)
                 mifareClassic.authenticateSectorWithKeyA(sectorIndex, sectorPassword)
                 toWrite = mifareClassic.readBlock(blockIndex)
@@ -212,7 +215,11 @@ class MifareNfcClassicPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 mifareClassic.close()
                 mNfcAdapter?.disableReaderMode(activity)
             }
-            activity.runOnUiThread { result.success(Utils.byteArray2Hex(toWrite)) }
+            // val resultMap = mapOf("minutes" to Utils.byteArray2Hex(toWrite)!!, "cardId" to tagId)
+            val resultMap = mutableMapOf<String, String>()
+            resultMap["minutes"] = Utils.byteArray2Hex(toWrite)!!
+            resultMap["cardId"] = tagId!!
+            activity.runOnUiThread { result.success(resultMap) }
         }, flag, null)
 
 
