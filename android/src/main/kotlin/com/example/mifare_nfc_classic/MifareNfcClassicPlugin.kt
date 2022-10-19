@@ -34,7 +34,7 @@ class MifareNfcClassicPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             val channel = MethodChannel(registrar.messenger(), CHANNEL_NAME)
             instance.channel = channel
             instance.mNfcAdapter = NfcAdapter.getDefaultAdapter(registrar.context())
-            instance.activity = registrar.activity()
+            instance.activity = registrar.activity() as Activity
             channel.setMethodCallHandler(MifareNfcClassicPlugin())
         }
     }

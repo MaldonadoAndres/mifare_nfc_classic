@@ -1,4 +1,4 @@
-group 'com.example.mifare_nfc_classic'
+group 'de.2kd.mifare_nfc_classic'
 version '1.0-SNAPSHOT'
 
 buildscript {
