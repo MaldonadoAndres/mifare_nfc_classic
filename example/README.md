@@ -1,6 +1,6 @@
 # mifare_nfc_classic_example
 
-A new Flutter project.
+Demonstrates how to use the mifare_nfc_classic plugin.
 
 ## Getting Started
 
