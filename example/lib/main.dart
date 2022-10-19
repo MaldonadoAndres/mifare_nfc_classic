@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mifare_nfc_classic/mifare_nfc_classic.dart';
 
-import 'package:mifare_nfc_classic_example/example_page.dart';
+import 'example_page.dart';
 
 void main() {
   runApp(MyApp());
