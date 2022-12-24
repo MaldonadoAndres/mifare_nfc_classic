@@ -8,7 +8,7 @@ private const val TAG = "Utils"
 
 object Utils {
 
-    fun byteArray2Hex(bytes: ByteArray?): String? {
+    fun byteArray2Hex(bytes: ByteArray?): String {
         val ret = StringBuilder()
         if (bytes != null) {
             for (b in bytes) {
@@ -77,7 +77,7 @@ object Utils {
                     blockBytes = blockBytes.copyOf(16)
                 }
                 val hex = byteArray2Hex(blockBytes)
-                sectorAsHex.add(hex!!)
+                sectorAsHex.add(hex)
                 // Log.d(TAG, "Printing Block: $hex")
             } catch (e: Exception) {
 
