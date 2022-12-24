@@ -8,77 +8,93 @@ class MifareNfcClassic {
 
   static Future<String?> readBlock({
     required int blockIndex,
-    String? password,
+    String? passwordA,
+    String? passwordB,
   }) async {
     final response = await _channel.invokeMethod('readBlock', {
       'blockIndex': blockIndex,
-      'password': password,
+      'passwordA': passwordA,
+      'passwordB': passwordB,
     });
     Logger().i(response);
     return response as String?;
   }
 
-  static Future<void> writeBlock({
+  static Future<bool> writeBlock({
     required int blockIndex,
     required String message,
-    String? password,
+    String? passwordA,
+    String? passwordB,
   }) async {
     final response = await _channel.invokeMethod('writeBlock', {
       'blockIndex': blockIndex,
       'message': message,
-      'password': password,
+      'passwordA': passwordA,
+      'passwordB': passwordB,
     });
     Logger().i(response);
+    return response as bool;
   }
 
   static Future<Map<String, dynamic>> overwriteBlock({
     required int blockIndex,
     required String message,
-    String? password,
+    String? passwordA,
+    String? passwordB,
   }) async {
     final response = await _channel.invokeMethod('overwriteBlock', {
       'blockIndex': blockIndex,
       'message': message,
-      'password': password,
+      'passwordA': passwordA,
+      'passwordB': passwordB,
     });
     Logger().i(response);
     return Map<String, dynamic>.from(response);
   }
 
-  static Future<void> changePasswordOfSector({
+  static Future<bool> changePasswordOfSector({
     required int sectorIndex,
-    required String newPassword,
-    String? password,
+    required String newPasswordA,
+    String? newPasswordB,
+    String? passwordA,
+    String? passwordB,
   }) async {
     final response = await _channel.invokeMethod('changePasswordOfSector', {
       'sectorIndex': sectorIndex,
-      'newPassword': newPassword,
-      'password': password
+      'newPasswordA': newPasswordA,
+      'newPasswordB': newPasswordB,
+      'passwordA': passwordA,
+      'passwordB': passwordB,
     });
     Logger().i(response);
+    return response as bool;
   }
 
-  static Future<void> writeRawHexToBlock({
+  static Future<bool> writeRawHexToBlock({
     required int blockIndex,
     required String message,
-    String? password,
+    String? passwordA,
+    String? passwordB,
   }) async {
     final response = await _channel.invokeMethod(
       'writeRawHexToBlock',
       {
         'blockIndex': blockIndex,
         'message': message,
-        'password': password,
+        'passwordA': passwordA,
+        'passwordB': passwordB,
       },
     );
     Logger().i(response);
+    return response as bool;
   }
 
   static Future<List<String>> readSector(
-      {required int sectorIndex, String? password}) async {
+      {required int sectorIndex, String? passwordA, String? passwordB}) async {
     final response = await _channel.invokeMethod('readSector', {
       'sectorIndex': sectorIndex,
-      'password': password,
+      'passwordA': passwordA,
+      'passwordB': passwordB,
     });
     Logger().i(response);
 
@@ -91,9 +107,13 @@ class MifareNfcClassic {
     return count;
   }
 
-  static Future<List<List<String>>> readAll({String? password}) async {
+  static Future<List<List<String>>> readAll({
+    String? passwordA,
+    String? passwordB,
+  }) async {
     final response = await _channel.invokeMethod('readAll', {
-      'password': password,
+      'passwordA': passwordA,
+      'passwordB': passwordB,
     }) as Map<dynamic, dynamic>;
     final listOfSectors = List<List<String>>.empty(growable: true);
     response.forEach((_, list) => listOfSectors.add(List<String>.from(list)));
