@@ -78,13 +78,7 @@ open class  DataBlockAccessConditions(C1: Boolean = true, C2: Boolean = true, C3
     }
 }
 
-internal class SectorAccessConditions// Log.d("accessConditionsBlock", "${Utils.byteToHex(accessConditionsBlock[0])} ${Utils.byteToHex(accessConditionsBlock[1])} ${Utils.byteToHex(accessConditionsBlock[2])}")
-//  Log.d("acByte2", acByteC1.joinToString("-","|","|"))
-//  Log.d("acByte3", acByteC2.joinToString("-","|","|"))
-//  Log.d("acByte3C3", acByteC3.joinToString("-","|","|"))
-// Log.d("block0", "$block0_C1 $block0_C2 $block0_C3")
-// Log.d("block1", "$block1_C1 $block1_C2 $block1_C3")
-// Log.d("block2", "$block2_C1 $block2_C2 $block2_C3")
+internal class SectorAccessConditions
     (accessConditionsBlock: ByteArray = byteArrayOf(0.toByte(), 240.toByte(), 255.toByte())) {
     var block0: DataBlockAccessConditions = DataBlockAccessConditions()
     var block1: DataBlockAccessConditions = DataBlockAccessConditions()
