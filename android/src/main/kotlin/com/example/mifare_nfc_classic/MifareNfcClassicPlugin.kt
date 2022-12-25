@@ -250,14 +250,14 @@ class MifareNfcClassicPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     //TODO Write to both sides
-    private fun changePasswordOfSector(result: Result, sectorIndex: Int, newPasswordA: String, newPasswordB: String, passwordA: String?, passwordB: String?) {
+    private fun changePasswordOfSector(result: Result, sectorIndex: Int, newPasswordA: String, newPasswordB: String?, passwordA: String?, passwordB: String?) {
         var didWrite = true
         mNfcAdapter?.enableReaderMode(activity, { tag ->
             try {
-                val sectorPassword: ByteArray = if (password.isNullOrEmpty()) {
+                val sectorPassword: ByteArray = if (passwordA.isNullOrEmpty()) {
                     MifareClassic.KEY_DEFAULT
                 } else {
-                    Utils.rawHexToByteArray(hex = password)
+                    Utils.rawHexToByteArray(hex = passwordA)
                 }
                 mifareClassic = MifareClassic.get(tag)
                 mifareClassic.connect()
@@ -265,8 +265,8 @@ class MifareNfcClassicPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 mifareClassic.authenticateSectorWithKeyA(sectorIndex, sectorPassword)
                 val toWrite = mifareClassic.readBlock(blockIndex)
                 val decList: ArrayList<Int> = arrayListOf()
-                for (i in newPassword.indices step 2) {
-                    val temp = "${newPassword[i]}${newPassword[i + 1]}"
+                for (i in newPasswordA.indices step 2) {
+                    val temp = "${newPasswordA[i]}${newPasswordA[i + 1]}"
                     decList.add(temp.toInt(radix = 16))
                 }
 
@@ -450,7 +450,7 @@ class MifareNfcClassicPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     private fun resolveAccessConditionsForSector(sectorIndex: Int, keyA: String?, mifareClassic: MifareClassic): SectorAccessConditions  {
-        var accessConditions = SectorAccessConditions.Common.NEVER;
+        var accessConditions = SectorAccessConditions.Common.NEVER
         try {
             val key: String = if(keyA.isNullOrEmpty()) { Utils.byteArray2Hex(bytes = MifareClassic.KEY_DEFAULT) } else keyA
             val block = mifareClassic.sectorToBlock(sectorIndex)
