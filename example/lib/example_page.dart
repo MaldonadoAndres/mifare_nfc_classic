@@ -118,7 +118,7 @@ class _ExamplePageState extends State<ExamplePage> {
                           onPressed: () async {
                             final message = await MifareNfcClassic.readSector(
                               sectorIndex: _selectedSector,
-                              password: this.message,
+                              passwordA: this.message,
                             );
                             await showToast(
                                 message:
@@ -224,7 +224,7 @@ class _ExamplePageState extends State<ExamplePage> {
                         } else {
                           await MifareNfcClassic.changePasswordOfSector(
                             sectorIndex: 1,
-                            newPassword: message,
+                            newPasswordA: message,
                           );
                         }
                       },
