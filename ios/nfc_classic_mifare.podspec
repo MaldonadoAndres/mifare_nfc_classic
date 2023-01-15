@@ -1,9 +1,9 @@
 #
 # To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html.
-# Run `pod lib lint mifare_nfc_classic.podspec' to validate before publishing.
+# Run `pod lib lint nfc_classic_mifare.podspec' to validate before publishing.
 #
 Pod::Spec.new do |s|
-  s.name             = 'mifare_nfc_classic'
+  s.name             = 'nfc_classic_mifare'
   s.version          = '0.0.1'
   s.summary          = 'A new Flutter plugin.'
   s.description      = <<-DESC

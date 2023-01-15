@@ -3,7 +3,7 @@
  * https://shop.sonmicro.com/Downloads/MIFARECLASSIC-UM.pdf
  */
 
-package com.example.mifare_nfc_classic
+package com.example.nfc_classic_mifare
 
 class SectorBlockAccessConditions constructor() : DataBlockAccessConditions() {
     val keyARead : AccessType = AccessType.Never

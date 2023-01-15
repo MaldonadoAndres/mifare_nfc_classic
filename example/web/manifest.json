@@ -1,6 +1,6 @@
 {
-    "name": "mifare_nfc_classic_example",
-    "short_name": "mifare_nfc_classic_example",
+    "name": "nfc_classic_mifare_example",
+    "short_name": "nfc_classic_mifare_example",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

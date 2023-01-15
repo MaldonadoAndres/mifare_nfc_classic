@@ -2,9 +2,9 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
 
-class MifareNfcClassic {
+class NfcClassicMifare {
   static const MethodChannel _channel =
-      const MethodChannel('mifare_nfc_classic');
+      const MethodChannel('nfc_classic_mifare');
 
   static Future<String?> readBlock({
     required int blockIndex,

@@ -1,4 +1,4 @@
-package com.example.mifare_nfc_classic_example
+package com.example.nfc_classic_mifare_example
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "mifare_nfc_classic_example" "\0"
+            VALUE "FileDescription", "nfc_classic_mifare_example" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "mifare_nfc_classic_example" "\0"
+            VALUE "InternalName", "nfc_classic_mifare_example" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2022 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "mifare_nfc_classic_example.exe" "\0"
-            VALUE "ProductName", "mifare_nfc_classic_example" "\0"
+            VALUE "OriginalFilename", "nfc_classic_mifare_example.exe" "\0"
+            VALUE "ProductName", "nfc_classic_mifare_example" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

@@ -1,10 +1,10 @@
 import Flutter
 import UIKit
 
-public class SwiftMifareNfcClassicPlugin: NSObject, FlutterPlugin {
+public class SwiftNfcClassicMifarePlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
-    let channel = FlutterMethodChannel(name: "mifare_nfc_classic", binaryMessenger: registrar.messenger())
-    let instance = SwiftMifareNfcClassicPlugin()
+    let channel = FlutterMethodChannel(name: "nfc_classic_mifare", binaryMessenger: registrar.messenger())
+    let instance = SwiftNfcClassicMifarePlugin()
     registrar.addMethodCallDelegate(instance, channel: channel)
   }
 

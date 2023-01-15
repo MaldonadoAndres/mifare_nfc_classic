@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:mifare_nfc_classic/mifare_nfc_classic.dart';
+import 'package:nfc_classic_mifare/nfc_classic_mifare.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 Future<List<int>> buildInitialAlert(BuildContext context) async {
@@ -12,8 +12,8 @@ Future<List<int>> buildInitialAlert(BuildContext context) async {
   );
 
   _alert.show();
-  listInfo.add(await MifareNfcClassic.sectorCount as int);
-  listInfo.add(await MifareNfcClassic.blockCount as int);
+  listInfo.add(await NfcClassicMifare.sectorCount as int);
+  listInfo.add(await NfcClassicMifare.blockCount as int);
   _alert.dismiss();
   return listInfo;
 }

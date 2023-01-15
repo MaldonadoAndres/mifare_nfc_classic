@@ -1,4 +1,4 @@
-package com.example.mifare_nfc_classic
+package com.example.nfc_classic_mifare
 
 import android.app.Activity
 import android.nfc.NfcAdapter
@@ -16,9 +16,9 @@ import io.flutter.plugin.common.PluginRegistry.Registrar
 import java.io.IOException
 
 
-private const val TAG = "MifareNfcClassicPlugin"
+private const val TAG = "NfcClassicMifarePlugin"
 
-class MifareNfcClassicPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
+class NfcClassicMifarePlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private lateinit var activity: Activity
     private lateinit var channel: MethodChannel
     private var mNfcAdapter: NfcAdapter? = null
@@ -26,16 +26,16 @@ class MifareNfcClassicPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private val flag = NfcAdapter.FLAG_READER_NFC_A
 
     companion object {
-        private const val CHANNEL_NAME = "mifare_nfc_classic'"
+        private const val CHANNEL_NAME = "nfc_classic_mifare'"
 
         @JvmStatic
         fun registerWith(registrar: Registrar) {
-            val instance = MifareNfcClassicPlugin()
+            val instance = NfcClassicMifarePlugin()
             val channel = MethodChannel(registrar.messenger(), CHANNEL_NAME)
             instance.channel = channel
             instance.mNfcAdapter = NfcAdapter.getDefaultAdapter(registrar.context())
             instance.activity = registrar.activity() as Activity
-            channel.setMethodCallHandler(MifareNfcClassicPlugin())
+            channel.setMethodCallHandler(NfcClassicMifarePlugin())
         }
     }
 
@@ -95,7 +95,7 @@ class MifareNfcClassicPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        channel = MethodChannel(flutterPluginBinding.binaryMessenger, "mifare_nfc_classic")
+        channel = MethodChannel(flutterPluginBinding.binaryMessenger, "nfc_classic_mifare")
         channel.setMethodCallHandler(this)
         mNfcAdapter = NfcAdapter.getDefaultAdapter(flutterPluginBinding.applicationContext)
     }

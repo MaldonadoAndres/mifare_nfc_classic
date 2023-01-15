@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mifare_nfc_classic/mifare_nfc_classic.dart';
+import 'package:nfc_classic_mifare/nfc_classic_mifare.dart';
 
 import 'example_page.dart';
 
@@ -13,7 +13,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final isAvailable = MifareNfcClassic.availability;
+  final isAvailable = NfcClassicMifare.availability;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

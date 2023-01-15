@@ -1,4 +1,4 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.example.mifare_nfc_classic">
+  package="com.example.nfc_classic_mifare">
     <uses-permission android:name="android.permission.NFC" />
 </manifest>

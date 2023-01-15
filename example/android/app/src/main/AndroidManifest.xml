@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.mifare_nfc_classic_example">
+    package="com.example.nfc_classic_mifare_example">
    <application
-        android:label="mifare_nfc_classic_example"
+        android:label="nfc_classic_mifare_example"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

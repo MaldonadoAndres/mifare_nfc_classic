@@ -1,4 +1,4 @@
 #import <Flutter/Flutter.h>
 
-@interface MifareNfcClassicPlugin : NSObject<FlutterPlugin>
+@interface NfcClassicMifarePlugin : NSObject<FlutterPlugin>
 @end

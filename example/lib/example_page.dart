@@ -1,6 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:mifare_nfc_classic/mifare_nfc_classic.dart';
+import 'package:nfc_classic_mifare/nfc_classic_mifare.dart';
 import 'utils.dart';
 
 class ExamplePage extends StatefulWidget {
@@ -103,7 +103,7 @@ class _ExamplePageState extends State<ExamplePage> {
                                 MaterialStateProperty.all(Colors.blue),
                           ),
                           onPressed: () async {
-                            final message = await MifareNfcClassic.readBlock(
+                            final message = await NfcClassicMifare.readBlock(
                               blockIndex: _selectedBlock,
                             );
                             await showToast(message: message as String);
@@ -116,7 +116,7 @@ class _ExamplePageState extends State<ExamplePage> {
                                 MaterialStateProperty.all(Colors.blue),
                           ),
                           onPressed: () async {
-                            final message = await MifareNfcClassic.readSector(
+                            final message = await NfcClassicMifare.readSector(
                               sectorIndex: _selectedSector,
                               passwordA: this.message,
                             );
@@ -132,7 +132,7 @@ class _ExamplePageState extends State<ExamplePage> {
                                 MaterialStateProperty.all(Colors.blue),
                           ),
                           onPressed: () async {
-                            _cardSectorsInfo = await MifareNfcClassic.readAll();
+                            _cardSectorsInfo = await NfcClassicMifare.readAll();
                             setState(() {});
                           },
                           child: Text('Read All'),
@@ -148,7 +148,7 @@ class _ExamplePageState extends State<ExamplePage> {
                                 MaterialStateProperty.all(Colors.blue),
                           ),
                           onPressed: () async => showToast(
-                              message: (await MifareNfcClassic.blockCount)
+                              message: (await NfcClassicMifare.blockCount)
                                   .toString()),
                           child: Text('Get Block Count'),
                         ),
@@ -158,7 +158,7 @@ class _ExamplePageState extends State<ExamplePage> {
                                 MaterialStateProperty.all(Colors.blue),
                           ),
                           onPressed: () async => showToast(
-                              message: (await MifareNfcClassic.sectorCount)
+                              message: (await NfcClassicMifare.sectorCount)
                                   .toString()),
                           child: Text('Get Sector Count'),
                         ),
@@ -192,7 +192,7 @@ class _ExamplePageState extends State<ExamplePage> {
                         } else if (message.isEmpty) {
                           showToast(message: "Write Something");
                         } else {
-                          await MifareNfcClassic.writeBlock(
+                          await NfcClassicMifare.writeBlock(
                               blockIndex: _selectedBlock, message: message);
                         }
                       },
@@ -207,7 +207,7 @@ class _ExamplePageState extends State<ExamplePage> {
                         if (message.isEmpty) {
                           showToast(message: "Write Something");
                         } else {
-                          await MifareNfcClassic.writeRawHexToBlock(
+                          await NfcClassicMifare.writeRawHexToBlock(
                               blockIndex: _selectedBlock, message: message);
                         }
                       },
@@ -222,7 +222,7 @@ class _ExamplePageState extends State<ExamplePage> {
                         if (message.isEmpty) {
                           showToast(message: "Write Something");
                         } else {
-                          await MifareNfcClassic.changePasswordOfSector(
+                          await NfcClassicMifare.changePasswordOfSector(
                             sectorIndex: 1,
                             newPasswordA: message,
                           );

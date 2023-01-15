@@ -1,4 +1,4 @@
-package com.example.mifare_nfc_classic
+package com.example.nfc_classic_mifare
 
 class SectorAccessConditions(
     val block0: DataBlockAccessConditions,

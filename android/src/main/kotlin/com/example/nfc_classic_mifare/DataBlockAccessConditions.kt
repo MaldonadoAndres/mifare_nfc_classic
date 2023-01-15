@@ -3,7 +3,7 @@
  * https://shop.sonmicro.com/Downloads/MIFARECLASSIC-UM.pdf
  */
 
-package com.example.mifare_nfc_classic
+package com.example.nfc_classic_mifare
 
 open class  DataBlockAccessConditions(C1: Boolean = true, C2: Boolean = true, C3: Boolean = true) {
     var writeKey: AccessType = AccessType.Never

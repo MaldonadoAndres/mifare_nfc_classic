@@ -1,6 +1,6 @@
-# mifare_nfc_classic_example
+# nfc_classic_mifare_example
 
-Demonstrates how to use the mifare_nfc_classic plugin.
+Demonstrates how to use the nfc_classic_mifare plugin.
 
 ## Getting Started
 
