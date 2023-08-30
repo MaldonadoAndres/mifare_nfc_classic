@@ -1,7 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:mifare_nfc_classic/mifare_nfc_classic.dart';
-import 'package:mifare_nfc_classic_example/utils.dart';
+import 'package:nfc_classic_mifare/nfc_classic_mifare.dart';
+import 'utils.dart';
 
 class ExamplePage extends StatefulWidget {
   @override
@@ -17,7 +17,7 @@ class _ExamplePageState extends State<ExamplePage> {
   ];
   var _selectedSector = 0;
   var _selectedBlock;
-  String message;
+  String message = "";
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +38,7 @@ class _ExamplePageState extends State<ExamplePage> {
                     CarouselSlider.builder(
                       itemCount: _cardSectorsInfo.length,
                       options: CarouselOptions(height: 200.0),
-                      itemBuilder: (context, index) {
+                      itemBuilder: (context, index, realIndex) {
                         return Container(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -67,7 +67,7 @@ class _ExamplePageState extends State<ExamplePage> {
                           }).toList(),
                           onChanged: (value) {
                             setState(() {
-                              _selectedSector = value;
+                              _selectedSector = value as int;
                               _selectedBlock = generateBlockList(
                                   _selectedSector, listInformation[1])[0];
                             });
@@ -97,22 +97,28 @@ class _ExamplePageState extends State<ExamplePage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        FlatButton(
-                          color: Colors.blue,
+                        TextButton(
+                          style: ButtonStyle(
+                            foregroundColor:
+                                MaterialStateProperty.all(Colors.blue),
+                          ),
                           onPressed: () async {
-                            final message = await MifareNfcClassic.readBlock(
+                            final message = await NfcClassicMifare.readBlock(
                               blockIndex: _selectedBlock,
                             );
-                            await showToast(message: message);
+                            await showToast(message: message as String);
                           },
                           child: Text('Read X Block Of Y Sector'),
                         ),
-                        FlatButton(
-                          color: Colors.blue,
+                        TextButton(
+                          style: ButtonStyle(
+                            foregroundColor:
+                                MaterialStateProperty.all(Colors.blue),
+                          ),
                           onPressed: () async {
-                            final message = await MifareNfcClassic.readSector(
+                            final message = await NfcClassicMifare.readSector(
                               sectorIndex: _selectedSector,
-                              password: this.message,
+                              passwordA: this.message,
                             );
                             await showToast(
                                 message:
@@ -120,10 +126,13 @@ class _ExamplePageState extends State<ExamplePage> {
                           },
                           child: Text('Read X Sector'),
                         ),
-                        FlatButton(
-                          color: Colors.blue,
+                        TextButton(
+                          style: ButtonStyle(
+                            foregroundColor:
+                                MaterialStateProperty.all(Colors.blue),
+                          ),
                           onPressed: () async {
-                            _cardSectorsInfo = await MifareNfcClassic.readAll();
+                            _cardSectorsInfo = await NfcClassicMifare.readAll();
                             setState(() {});
                           },
                           child: Text('Read All'),
@@ -133,17 +142,23 @@ class _ExamplePageState extends State<ExamplePage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        FlatButton(
-                          color: Colors.blue,
+                        TextButton(
+                          style: ButtonStyle(
+                            foregroundColor:
+                                MaterialStateProperty.all(Colors.blue),
+                          ),
                           onPressed: () async => showToast(
-                              message: (await MifareNfcClassic.blockCount)
+                              message: (await NfcClassicMifare.blockCount)
                                   .toString()),
                           child: Text('Get Block Count'),
                         ),
-                        FlatButton(
-                          color: Colors.blue,
+                        TextButton(
+                          style: ButtonStyle(
+                            foregroundColor:
+                                MaterialStateProperty.all(Colors.blue),
+                          ),
                           onPressed: () async => showToast(
-                              message: (await MifareNfcClassic.sectorCount)
+                              message: (await NfcClassicMifare.sectorCount)
                                   .toString()),
                           child: Text('Get Sector Count'),
                         ),
@@ -156,7 +171,7 @@ class _ExamplePageState extends State<ExamplePage> {
                         key: _formKey,
                         child: TextFormField(
                           initialValue: 'af0910ceff69'.toUpperCase(),
-                          onSaved: (newValue) => message = newValue,
+                          onSaved: (newValue) => message = newValue as String,
                           decoration: InputDecoration(
                             border: const OutlineInputBorder(),
                             labelText: 'Message',
@@ -164,10 +179,12 @@ class _ExamplePageState extends State<ExamplePage> {
                         ),
                       ),
                     ),
-                    FlatButton(
-                      color: Colors.blue,
+                    TextButton(
+                      style: ButtonStyle(
+                        foregroundColor: MaterialStateProperty.all(Colors.blue),
+                      ),
                       onPressed: () async {
-                        _formKey.currentState.save();
+                        _formKey.currentState?.save();
                         if (_selectedSector == 0 ||
                             (_selectedBlock + 1) % 4 == 0) {
                           showToast(
@@ -175,35 +192,39 @@ class _ExamplePageState extends State<ExamplePage> {
                         } else if (message.isEmpty) {
                           showToast(message: "Write Something");
                         } else {
-                          await MifareNfcClassic.writeBlock(
+                          await NfcClassicMifare.writeBlock(
                               blockIndex: _selectedBlock, message: message);
                         }
                       },
                       child: Text('Write X Block'),
                     ),
-                    FlatButton(
-                      color: Colors.teal,
+                    TextButton(
+                      style: ButtonStyle(
+                        foregroundColor: MaterialStateProperty.all(Colors.teal),
+                      ),
                       onPressed: () async {
-                        _formKey.currentState.save();
+                        _formKey.currentState?.save();
                         if (message.isEmpty) {
                           showToast(message: "Write Something");
                         } else {
-                          await MifareNfcClassic.writeRawHexToBlock(
+                          await NfcClassicMifare.writeRawHexToBlock(
                               blockIndex: _selectedBlock, message: message);
                         }
                       },
                       child: Text('Write X Block (Raw)'),
                     ),
-                    FlatButton(
-                      color: Colors.teal,
+                    TextButton(
+                      style: ButtonStyle(
+                        foregroundColor: MaterialStateProperty.all(Colors.teal),
+                      ),
                       onPressed: () async {
-                        _formKey.currentState.save();
+                        _formKey.currentState?.save();
                         if (message.isEmpty) {
                           showToast(message: "Write Something");
                         } else {
-                          await MifareNfcClassic.changePasswordOfSector(
+                          await NfcClassicMifare.changePasswordOfSector(
                             sectorIndex: 1,
-                            newPassword: message,
+                            newPasswordA: message,
                           );
                         }
                       },
@@ -214,7 +235,7 @@ class _ExamplePageState extends State<ExamplePage> {
               ),
               Visibility(
                 visible: !hasInformation,
-                child: FlatButton(
+                child: TextButton(
                   onPressed: () async {
                     listInformation.clear();
                     listInformation.addAll(await buildInitialAlert(context));
@@ -223,7 +244,9 @@ class _ExamplePageState extends State<ExamplePage> {
                     });
                   },
                   child: Text('Read Card Information'),
-                  color: Colors.blue,
+                  style: ButtonStyle(
+                    foregroundColor: MaterialStateProperty.all(Colors.blue),
+                  ),
                 ),
               )
             ],

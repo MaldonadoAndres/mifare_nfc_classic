@@ -1,4 +1,4 @@
-# mifare_nfc_classic
+# nfc_mifare_classic
 
 A Flutter plugin for Android for reading and writing NFC cards
 
@@ -19,13 +19,18 @@ A Flutter plugin for Android for reading and writing NFC cards
 - If you write in the 4th block of any sector write down what you write this is the new password for write and read in this sector
 - In all cases the password parameter is optional, is only in the case the sector has a custom password
 
+## Thanks
+
+This plugin in based on the original package mifare_nfc_classic of Andres Maldonado (https://github.com/MaldonadoAndres/mifare_nfc_classic/). 
+Sadly my pull request for Null Safety was not not yet integrated, so I published my own branch with a new package name.
+
 ## Usage
 
 **Check NFC Availability**
 
 ```dart
 // Check availability
-AVAILABILITY isAvailable = await MifareNfcClassic.availability;
+AVAILABILITY isAvailable = await NfcClassicMifare.availability;
 switch(isAvailable){
     case(AVAILABILITY.AVAILABLE):
         //NFC is enabled.
@@ -42,14 +47,14 @@ switch(isAvailable){
 **Get Sector or Block Count**
 
 ```dart
-int _sectorCount = await MifareNfcClassic.sectorCount;
-int _blockCount = await MifareNfcClassic.blockCount;
+int _sectorCount = await NfcClassicMifare.sectorCount;
+int _blockCount = await NfcClassicMifare.blockCount;
 ```
 
 **Read a specific Sector**
 
 ```dart
-List<String> _sector = await MifareNfcClassic.readSector(sectorIndex:index,password:password)
+List<String> _sector = await NfcClassicMifare.readSector(sectorIndex:index,password:password)
 /*
 ["FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
 "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
@@ -61,7 +66,7 @@ List<String> _sector = await MifareNfcClassic.readSector(sectorIndex:index,passw
 **Read a specific Block of a specific Sector**
 
 ```dart
-String _block = await MifareNfcClassic.readBlock(blockIndex: _blockIndex,password:password);
+String _block = await NfcClassicMifare.readBlock(blockIndex: _blockIndex,password:password);
 /*
 "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 */
@@ -72,7 +77,7 @@ String _block = await MifareNfcClassic.readBlock(blockIndex: _blockIndex,passwor
 Note: This operation take some seconds so leave the card close to the phone like for 2 seconds.
 
 ```dart
-List<List<String>> _card = await MifareNfcClassic.readAll(password:password);
+List<List<String>> _card = await NfcClassicMifare.readAll(password:password);
 /*
 [["FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
 "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
@@ -91,7 +96,7 @@ List<List<String>> _card = await MifareNfcClassic.readAll(password:password);
 **Write a specific Block of a specific Sector**
 
 ```dart
-bool didWrite = await  MifareNfcClassic.writeBlock(blockIndex: _blockIndex,message: _message,password:password);
+bool didWrite = await  NfcClassicMifare.writeBlock(blockIndex: _blockIndex,message: _message,password:password);
 /*
 didWrite indicates if the operation completed successfully or not.
 */
@@ -100,11 +105,11 @@ didWrite indicates if the operation completed successfully or not.
 **Change Password of a Sector**
 
 ```dart
-await  MifareNfcClassic.changePasswordOfSector(sectorIndex: _sectorIndex,newPassword: _newPassword,password:password);
+await  NfcClassicMifare.changePasswordOfSector(sectorIndex: _sectorIndex,newPassword: _newPassword,password:password);
 ```
 
 **Write Raw Hexadecimal**
 
 ```dart
-await  MifareNfcClassic.writeRawHexToBlock(blockIndex: _blockIndex,message: rawHex,password:password);
+await  NfcClassicMifare.writeRawHexToBlock(blockIndex: _blockIndex,message: rawHex,password:password);
 ```

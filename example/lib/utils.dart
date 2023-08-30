@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:mifare_nfc_classic/mifare_nfc_classic.dart';
+import 'package:nfc_classic_mifare/nfc_classic_mifare.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 Future<List<int>> buildInitialAlert(BuildContext context) async {
-  final listInfo = List<int>();
+  final listInfo = List<int>.empty(growable: true);
   final _alert = Alert(
     context: context,
     title: 'Example',
@@ -12,8 +12,8 @@ Future<List<int>> buildInitialAlert(BuildContext context) async {
   );
 
   _alert.show();
-  listInfo.add(await MifareNfcClassic.sectorCount);
-  listInfo.add(await MifareNfcClassic.blockCount);
+  listInfo.add(await NfcClassicMifare.sectorCount as int);
+  listInfo.add(await NfcClassicMifare.blockCount as int);
   _alert.dismiss();
   return listInfo;
 }
@@ -26,7 +26,7 @@ List<int> generateBlockList(int sector, int size) {
   return [for (var i = sector * 4; i < (sector * 4) + 4; i += 1) i];
 }
 
-Future<void> showToast({@required String message}) async {
+Future<void> showToast({String message = ""}) async {
   await Fluttertoast.showToast(
       msg: message,
       toastLength: Toast.LENGTH_SHORT,
